@@ -1,6 +1,5 @@
 import asyncio
 import janus
-import os
 from socketlib import ClientReceiver
 from socketlib.utils.logger import get_module_logger
 from typing import Callable
@@ -29,7 +28,7 @@ def main(
     )
 
     server_address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
-    server = Server(address=address, received=received.async_q, logger=logger)
+    server = Server(address=server_address, to_send=received.async_q, logger=logger)
 
     with client:
         client.connect()
