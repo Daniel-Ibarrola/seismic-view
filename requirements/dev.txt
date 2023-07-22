@@ -1,3 +1,4 @@
 -r common.txt
 pytest==7.4.0
 bumpver==2023.1125
+pytest-asyncio==0.21.1
