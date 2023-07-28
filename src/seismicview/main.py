@@ -5,7 +5,7 @@ from socketlib.utils.logger import get_module_logger
 from typing import Callable
 
 from seismicview import CONFIG
-from seismicview.server import WSServer
+from seismicview.wsserver import WSServer
 
 
 def main(

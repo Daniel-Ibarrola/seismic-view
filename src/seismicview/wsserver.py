@@ -94,6 +94,7 @@ class WSServer:
             await self.send_station_data(msg, self.connections)
 
     async def start(self) -> None:
+        self._logger.info(f"Server listening on {self.host}:{self.port}")
         server = await websockets.serve(self.handle_new_connection, self.host, self.port)
 
         try:
@@ -105,15 +106,19 @@ class WSServer:
             self._logger.info("Server stopped")
 
 
-async def start_server(stop_event: threading.Event) -> None:
+async def start_server(logger: logging.Logger) -> tuple[WSServer, janus.SyncQueue]:
     """ Start the websocket server in isolation.
     """
-    logger = get_module_logger("Server", "dev", use_file_handler=False)
-
     messages: janus.Queue[bytes] = janus.Queue()
+    server_address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
+    server = WSServer(address=server_address, to_send=messages.async_q, logger=logger)
+    return server, messages.sync_q
 
-    def generate_messages(queue: janus.SyncQueue, stop: threading.Event):
-        while not stop.is_set():
+
+async def main(stop_event: threading.Thread()) -> None:
+
+    def generate_messages(queue: janus.SyncQueue, stop_: threading.Event) -> None:
+        while not stop_.is_set():
             json_data = {
                 "station": "S160",
                 "channel": "HLZ",
@@ -127,31 +132,25 @@ async def start_server(stop_event: threading.Event) -> None:
             time.sleep(1)
         logger.info("Exiting generate messages")
 
+    logger = get_module_logger("Server", "dev", use_file_handler=False)
+
+    server, messages = await start_server(logger)
+
     thread = threading.Thread(
         target=generate_messages,
-        args=(messages.sync_q, stop_event)
+        args=(messages, stop_event),
+        daemon=True
     )
-
-    server_address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
-    server = WSServer(address=server_address, to_send=messages.async_q, logger=logger)
-    server.add_stop_listener()
-
-    logger.info(f"Server listening in {server_address}")
-
     thread.start()
+
+    server.add_stop_listener()
     await server.start()
-
-    thread.join()
-    logger.info("Exiting...")
-
-
-def main() -> None:
-    stop_event = threading.Event()
-    try:
-        asyncio.run(start_server(stop_event))
-    except KeyboardInterrupt:
-        stop_event.set()
 
 
 if __name__ == "__main__":
-    main()
+    stop = threading.Event()
+    try:
+        asyncio.run(main(stop))
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt. Stopping")
+        stop.set()
