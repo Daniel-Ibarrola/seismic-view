@@ -1,5 +1,7 @@
+import asyncio
 import json
 from socketlib import ServerSender
+from socketlib.utils.logger import get_module_logger
 import time
 import threading
 import pytest
@@ -7,33 +9,39 @@ import pytest_asyncio
 import websockets as ws
 
 from seismicview import CONFIG
-from seismicview.server import WSServer
 from seismicview.main import main
+
+
+async def stop_all(stop_event: threading.Event) -> None:
+    stop_event.set()
+    tasks = [task for task in asyncio.all_tasks() if task is not asyncio.current_task()]
+    for task in tasks:
+        task.cancel()
+
+    await asyncio.gather(*tasks, return_exceptions=True)
+    asyncio.get_event_loop().stop()
 
 
 @pytest_asyncio.fixture()
 async def start_client_receiver_and_websocket_server():
     stop_event = threading.Event()
-    thread = threading.Thread(
-        target=main,
-        args=(False, 0.1, lambda: not stop_event.is_set())
-    )
-    thread.start()
-    time.sleep(0.1)  # give the client and server some time to start
+    asyncio.ensure_future(main(False, 0.1, lambda: stop_event.is_set()))
+    await asyncio.sleep(0.1)  # Give the services some time to start
     yield
 
     # Cleanup the client and server
     stop_event.set()
-    await WSServer.stop()
-    thread.join()
+    await stop_all(stop_event)
 
 
 @pytest.fixture()
 def start_server_sender():
+    logger = get_module_logger("ServerSender", "dev", use_file_handler=False)
     server = ServerSender(
         address=(CONFIG.CLIENT_HOST_IP, CONFIG.CLIENT_HOST_PORT),
         reconnect=False,
         timeout=0.1,
+        logger=logger
     )
     station1 = {
         "name": "S160",

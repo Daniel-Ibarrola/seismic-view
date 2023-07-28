@@ -6,6 +6,7 @@ import signal
 from socketlib.utils.logger import get_module_logger
 import threading
 import time
+from typing import Callable, Optional
 import websockets
 
 from seismicview import CONFIG
@@ -28,22 +29,34 @@ class WSServer:
     def __init__(
             self,
             address: tuple[str, int],
-            to_send: janus.AsyncQueue[bytes],
-            logger: logging.Logger
+            to_send: Optional[janus.AsyncQueue[bytes]],
+            logger: Optional[logging.Logger] = None
     ):
         self.host = address[0]
         self.port = address[1]
 
         self._to_send = to_send
-        self._logger = logger
+
+        if logger is not None:
+            self._logger = logger
+        else:
+            self._logger = get_module_logger(__name__, CONFIG.NAME, use_file_handler=False)
 
         self.connections = {}  # type: dict[websockets.WebSocketServerProtocol, str]
 
-    def add_stop_listener(self):
+    @property
+    def to_send(self) -> janus.AsyncQueue:
+        return self._to_send
+
+    def add_stop_listener(self, listener: Optional[Callable] = None, *args):
         loop = asyncio.get_event_loop()
         for sig_name in {'SIGINT', 'SIGTERM'}:
-            loop.add_signal_handler(getattr(signal, sig_name),
-                                    lambda: asyncio.ensure_future(self.stop()))
+            if listener is None:
+                loop.add_signal_handler(getattr(signal, sig_name),
+                                        lambda: asyncio.ensure_future(self.stop()))
+            else:
+                loop.add_signal_handler(getattr(signal, sig_name),
+                                        lambda: asyncio.ensure_future(listener(*args)))
 
     async def stop(self) -> None:
         self._logger.info("Stopping WebSocket Server...")
@@ -57,7 +70,7 @@ class WSServer:
     @staticmethod
     async def send_station_data(
             data: bytes,
-            connections: dict[websockets.WebSocketServerProtocol, str]
+            connections: dict[websockets.WebSocketServerProtocol, str],
     ) -> None:
         """ Sends the most recent message to all clients, if the requested
             station is the same as the one in the message.
@@ -115,7 +128,7 @@ async def start_server(logger: logging.Logger) -> tuple[WSServer, janus.SyncQueu
     return server, messages.sync_q
 
 
-async def main(stop_event: threading.Thread()) -> None:
+async def main() -> None:
 
     def generate_messages(queue: janus.SyncQueue, stop_: threading.Event) -> None:
         while not stop_.is_set():
@@ -136,6 +149,7 @@ async def main(stop_event: threading.Thread()) -> None:
 
     server, messages = await start_server(logger)
 
+    stop_event = threading.Event()
     thread = threading.Thread(
         target=generate_messages,
         args=(messages, stop_event),
@@ -146,11 +160,12 @@ async def main(stop_event: threading.Thread()) -> None:
     server.add_stop_listener()
     await server.start()
 
+    stop_event.set()
+    thread.join()
+
 
 if __name__ == "__main__":
-    stop = threading.Event()
     try:
-        asyncio.run(main(stop))
+        asyncio.run(main())
     except KeyboardInterrupt:
-        print("Keyboard Interrupt. Stopping")
-        stop.set()
+        pass
