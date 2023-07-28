@@ -5,7 +5,7 @@ from socketlib.utils.logger import get_module_logger
 from typing import Callable
 
 from seismicview import CONFIG
-from seismicview.server import Server
+from seismicview.server import WSServer
 
 
 def main(
@@ -13,7 +13,12 @@ def main(
         timeout: float = 5, 
         stop: Callable[[], bool] = lambda: False
 ):
-    logger = get_module_logger("Seismic View Server", CONFIG.NAME)
+    if "dev" in CONFIG.NAME:
+        use_fh = False
+    else:
+        use_fh = True
+
+    logger = get_module_logger("Seismic View Server", CONFIG.NAME, use_file_handler=use_fh)
 
     received: janus.Queue[bytes] = janus.Queue()
 
@@ -28,7 +33,7 @@ def main(
     )
 
     server_address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
-    server = Server(address=server_address, to_send=received.async_q, logger=logger)
+    server = WSServer(address=server_address, to_send=received.async_q, logger=logger)
 
     with client:
         client.connect()

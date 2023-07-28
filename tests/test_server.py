@@ -5,7 +5,7 @@ import pytest_asyncio
 import websockets as ws
 
 from seismicview import CONFIG
-from seismicview.server import Server
+from seismicview.wsserver import WSServer
 
 
 class TestServer:
@@ -13,7 +13,7 @@ class TestServer:
     @pytest_asyncio.fixture()
     async def start_server(self):
         address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
-        server = Server(address=address)
+        server = WSServer(address=address)
 
         station1 = {
             "name": "S160",

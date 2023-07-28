@@ -7,7 +7,7 @@ import pytest_asyncio
 import websockets as ws
 
 from seismicview import CONFIG
-from seismicview.server import Server
+from seismicview.server import WSServer
 from seismicview.main import main
 
 
@@ -24,7 +24,7 @@ async def start_client_receiver_and_websocket_server():
 
     # Cleanup the client and server
     stop_event.set()
-    await Server.stop()
+    await WSServer.stop()
     thread.join()
 
 

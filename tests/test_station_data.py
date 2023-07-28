@@ -1,6 +1,6 @@
 import json
 import pytest
-from seismicview.server import Server
+from seismicview.wsserver import WSServer
 
 
 class FakeWebsocket:
@@ -33,7 +33,7 @@ class TestSendStationData:
             "trace": [4, 5, 6]
         }).encode()
 
-        await Server.send_station_data(data, connections)
+        await WSServer.send_station_data(data, connections)
         assert len(websocket1.sent) == 0
         assert len(websocket2.sent) == 0
 
@@ -54,7 +54,7 @@ class TestSendStationData:
         }
         json_data = json.dumps(data).encode()
 
-        await Server.send_station_data(json_data, connections)
+        await WSServer.send_station_data(json_data, connections)
 
         assert len(websocket1.sent) == 1
         assert len(websocket2.sent) == 0
@@ -79,7 +79,7 @@ class TestSendStationData:
         }
         json_data = json.dumps(data).encode()
 
-        await Server.send_station_data(json_data, connections)
+        await WSServer.send_station_data(json_data, connections)
         assert len(websocket1.sent) == 1
         assert len(websocket2.sent) == 1
 
