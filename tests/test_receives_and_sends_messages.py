@@ -25,6 +25,7 @@ async def start_client_receiver_and_websocket_server():
     # Cleanup the client and server
     stop_event.set()
     await Server.stop()
+    thread.join()
 
 
 @pytest.fixture()
@@ -52,10 +53,12 @@ def start_server_sender():
 
     # Stop the server
     server.shutdown()
+    server.close_connection()
 
 
 @pytest.mark.usefixtures("start_client_receiver_and_websocket_server")
 @pytest.mark.usefixtures("start_server_sender")
+@pytest.mark.timeout(5)
 @pytest.mark.asyncio
 async def test_websocket_client_receives_requested_station_data():
     uri = f"ws://{CONFIG.SERVER_HOST_IP}:{CONFIG.SERVER_HOST_PORT}"
@@ -71,6 +74,7 @@ async def test_websocket_client_receives_requested_station_data():
 
 @pytest.mark.usefixtures("start_client_receiver_and_websocket_server")
 @pytest.mark.usefixtures("start_server_sender")
+@pytest.mark.timeout(5)
 @pytest.mark.asyncio
 async def test_multiple_clients():
     uri = f"ws://{CONFIG.SERVER_HOST_IP}:{CONFIG.SERVER_HOST_PORT}"
