@@ -95,7 +95,6 @@ class WaveServer(ServerSender):
 
     def generate_and_send_waves(self) -> None:
         while not self._stop():
-            error = False
             for station, channels in STATIONS.items():
                 for ch in channels:
                     wave = {
@@ -115,9 +114,7 @@ class WaveServer(ServerSender):
                         "WaveServer"
                     )
                     if error:
-                        break
-                if error:
-                    break
+                        return
             time.sleep(1)
 
     def _send(self):
