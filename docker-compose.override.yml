@@ -1,0 +1,8 @@
+services:
+
+  seismicview:
+    volumes:
+      - ./src:/src
+      - ./tests:/tests
+    environment:
+      - CONFIG=dev

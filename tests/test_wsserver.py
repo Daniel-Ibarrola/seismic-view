@@ -3,14 +3,14 @@ import janus
 import json
 import pytest
 import pytest_asyncio
-import random
 import websockets as ws
 
 from seismicview.wsserver import WSServer
+from address import get_socket_address
 
 
 class TestServer:
-    address = "localhost", random.randint(1024, 49150)
+    address = get_socket_address()
 
     @pytest_asyncio.fixture()
     async def ws_server(self) -> WSServer:
