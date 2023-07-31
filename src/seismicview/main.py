@@ -15,6 +15,10 @@ async def main(
         stop: Optional[Callable[[], bool]] = None,
         stop_listener: Optional[Callable] = None
 ):
+    """ Starts a client that expects to receive the data of each station in json format.
+        This data is then passed to the Websocket Server, which other websocket clients can
+        connect to obtain the data of the desired station.
+    """
     if "dev" in CONFIG.NAME:
         use_fh = False
     else:

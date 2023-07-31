@@ -1,9 +1,13 @@
-""" Websocket client that receives data periodically
+""" Websocket client that receives data periodically.
+
+    Can be used to test the main program.
 """
 import asyncio
 import websockets as ws
 import sys
 import signal
+
+from seismicview import CONFIG
 
 
 async def receive(
@@ -43,7 +47,7 @@ async def main():
     else:
         raise ValueError("Must pass a station as argument")
 
-    uri = "ws://localhost:1550"
+    uri = f"ws://{CONFIG.SERVER_HOST_IP}:{CONFIG.SERVER_HOST_PORT}"
     async for client in ws.connect(uri):
         try:
             await receive(client, station)
