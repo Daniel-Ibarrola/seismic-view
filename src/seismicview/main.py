@@ -11,7 +11,7 @@ async def main(
         ws_server_address: tuple[str, int],
         server_receiver_address: tuple[str, int],
         reconnect: bool = False,
-        timeout: float = 5, 
+        timeout: Optional[float] = 5,
         stop: Optional[Callable[[], bool]] = None,
         stop_listener: Optional[Callable] = None
 ):
@@ -50,7 +50,8 @@ if __name__ == "__main__":
     try:
         asyncio.run(main(
             (CONFIG.WS_SERVER_HOST_IP, CONFIG.WS_SERVER_HOST_PORT),
-            (CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT)
+            (CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT),
+            timeout=None
         ))
     except KeyboardInterrupt:
         pass
