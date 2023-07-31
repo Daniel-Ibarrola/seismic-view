@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+
+  seismicview:
+    entrypoint: [
+        "python",
+        "/src/seismicview/main.py"
+    ]
+    environment:
+      # Address from which the server receives information
+      - SERVER_HOST_IP=seismicview
+      - SERVER_HOST_IP=13342
+      # Address of the websocket server
+      - WS_SERVER_HOST_IP=seismicview
+      - WS_SERVER_HOST_PORT=13345
+    ports:
+      - "13342:13342"
+      - "13345:13345"

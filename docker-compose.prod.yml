@@ -1,0 +1,6 @@
+services:
+
+  seismicview:
+    restart: unless-stopped
+    environment:
+      - CONFIG=prod
