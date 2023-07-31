@@ -47,7 +47,7 @@ async def main():
     else:
         raise ValueError("Must pass a station as argument")
 
-    uri = f"ws://{CONFIG.SERVER_HOST_IP}:{CONFIG.SERVER_HOST_PORT}"
+    uri = f"ws://{CONFIG.WS_SERVER_HOST_IP}:{CONFIG.WS_SERVER_HOST_PORT}"
     async for client in ws.connect(uri):
         try:
             await receive(client, station)

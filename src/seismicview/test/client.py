@@ -5,7 +5,7 @@
 import json
 import logging
 import time
-from socketlib import ServerSender
+from socketlib import ClientSender
 from socketlib.basic.send import send_msg
 from socketlib.utils.logger import get_module_logger
 import sys
@@ -64,7 +64,7 @@ STATIONS = {
 }
 
 
-class WaveServer(ServerSender):
+class WaveClient(ClientSender):
 
     def __init__(
             self,
@@ -107,7 +107,7 @@ class WaveServer(ServerSender):
                     }
                     msg = json.dumps(wave)
                     error = send_msg(
-                        self._connection,
+                        self._socket,
                         msg,
                         self.msg_end,
                         self._logger,
@@ -118,13 +118,12 @@ class WaveServer(ServerSender):
             time.sleep(1)
 
     def _send(self):
+        self._wait_for_connection.wait()
         if self._reconnect:
             while not self._stop_reconnect():
-                self.accept_connection()
                 self.generate_and_send_waves()
-                self.listen()
+                self._connect_to_server()
         else:
-            self.accept_connection()
             self.generate_and_send_waves()
 
 
@@ -134,21 +133,22 @@ def main():
         n_stations = int(sys.argv[1])
 
     logger = get_module_logger("WaveServer", "dev", use_file_handler=False)
-    server = WaveServer(
-        address=(CONFIG.CLIENT_HOST_IP, CONFIG.CLIENT_HOST_PORT),
+    client = WaveClient(
+        address=(CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT),
         n_stations=n_stations,
         reconnect=False,
         timeout=5,
         logger=logger
     )
 
-    with server:
-        server.start()
+    with client:
+        client.connect()
+        client.start()
 
         try:
-            server.join()
+            client.join()
         except KeyboardInterrupt:
-            server.shutdown()
+            client.shutdown()
 
     logger.info("Graceful shutdown")
 

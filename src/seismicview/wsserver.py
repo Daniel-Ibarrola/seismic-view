@@ -146,7 +146,7 @@ async def main() -> None:
 
     logger = get_module_logger("Server", "dev", use_file_handler=False)
 
-    server_address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
+    server_address = CONFIG.WS_SERVER_HOST_IP, CONFIG.WS_SERVER_HOST_PORT
     server, messages = await start_server(server_address, logger)
 
     stop_event = threading.Event()
