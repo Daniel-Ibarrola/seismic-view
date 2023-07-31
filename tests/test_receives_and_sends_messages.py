@@ -5,16 +5,16 @@ from socketlib.utils.logger import get_module_logger
 import threading
 import pytest
 import pytest_asyncio
-import random
 import websockets as ws
 
 from seismicview.main import main
+from address import get_socket_address
 
 
 class TestMain:
 
-    ws_server_address = "localhost", random.randint(1024, 49150)
-    server_receiver_address = "localhost", random.randint(1024, 49150)
+    ws_server_address = get_socket_address()
+    server_receiver_address = get_socket_address()
 
     @staticmethod
     async def stop_all(stop_event: threading.Event) -> None:

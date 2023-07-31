@@ -7,8 +7,10 @@ COPY src/ /src/
 COPY tests/ /tests/
 
 RUN mkdir -p /logs && \
-    pip install -r /requirements/dev.txt \
+    pip install -r /requirements/dev.txt && \
+    pip install -e .
 
-RUN pytest
+#ENV HOST_DOMAIN=host.docker.internal:host-gateway
+#RUN pytest /tests/
+
 WORKDIR /src
-

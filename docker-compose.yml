@@ -3,6 +3,8 @@ version: "3"
 services:
 
   seismicview:
+    build:
+      dockerfile: DockerFile
     entrypoint: [
         "python",
         "/src/seismicview/main.py"
@@ -10,7 +12,7 @@ services:
     environment:
       # Address from which the server receives information
       - SERVER_HOST_IP=seismicview
-      - SERVER_HOST_IP=13342
+      - SERVER_HOST_PORT=13342
       # Address of the websocket server
       - WS_SERVER_HOST_IP=seismicview
       - WS_SERVER_HOST_PORT=13345
