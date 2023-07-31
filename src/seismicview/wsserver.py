@@ -119,12 +119,11 @@ class WSServer:
             self._logger.info("Server stopped")
 
 
-async def start_server(logger: logging.Logger) -> tuple[WSServer, janus.SyncQueue]:
+async def start_server(address: tuple[str, int], logger: logging.Logger) -> tuple[WSServer, janus.SyncQueue]:
     """ Start the websocket server in isolation.
     """
     messages: janus.Queue[bytes] = janus.Queue()
-    server_address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
-    server = WSServer(address=server_address, to_send=messages.async_q, logger=logger)
+    server = WSServer(address=address, to_send=messages.async_q, logger=logger)
     return server, messages.sync_q
 
 
@@ -147,7 +146,8 @@ async def main() -> None:
 
     logger = get_module_logger("Server", "dev", use_file_handler=False)
 
-    server, messages = await start_server(logger)
+    server_address = CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT
+    server, messages = await start_server(server_address, logger)
 
     stop_event = threading.Event()
     thread = threading.Thread(

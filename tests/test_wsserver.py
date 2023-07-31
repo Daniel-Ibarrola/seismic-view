@@ -4,7 +4,6 @@ import json
 import pytest
 import pytest_asyncio
 import random
-from socketlib.utils.logger import get_module_logger
 import websockets as ws
 
 from seismicview.wsserver import WSServer
@@ -36,7 +35,6 @@ class TestServer:
             "channel": "HLZ",
             "trace": [1, 2, 3, 4]
         }
-
         await server.to_send.put(json.dumps(station1).encode())
         await server.to_send.put(json.dumps(station2).encode())
 
@@ -67,7 +65,7 @@ class TestServer:
             await websocket1.send("S160")
             await websocket2.send("C166")
             await asyncio.sleep(0.1)  # give the clients some time to connect
-            
+
             await self.put_in_queue(ws_server)
 
             data1 = await websocket1.recv()

@@ -28,7 +28,7 @@ class TestSendStationData:
         }
 
         data = json.dumps({
-            "name": "D170",
+            "station": "D170",
             "channel": "HLZ",
             "trace": [4, 5, 6]
         }).encode()
@@ -48,7 +48,7 @@ class TestSendStationData:
         }
 
         data = {
-            "name": "S160",
+            "station": "S160",
             "channel": "HLZ",
             "trace": [4, 5, 6]
         }
@@ -73,7 +73,7 @@ class TestSendStationData:
         }
 
         data = {
-            "name": "S160",
+            "station": "S160",
             "channel": "HLZ",
             "trace": [4, 5, 6]
         }

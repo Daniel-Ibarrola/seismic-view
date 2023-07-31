@@ -8,6 +8,8 @@ from seismicview.wsserver import start_server
 
 
 async def main(
+        ws_server_address: tuple[str, int],
+        client_receiver_address: tuple[str, int],
         reconnect: bool = True, 
         timeout: float = 5, 
         stop: Optional[Callable[[], bool]] = None,
@@ -19,12 +21,9 @@ async def main(
         use_fh = True
 
     logger = get_module_logger("Seismic View Server", CONFIG.NAME, use_file_handler=use_fh)
-
-    server, messages = start_server(logger)
-
-    client_address = CONFIG.CLIENT_HOST_IP, CONFIG.CLIENT_HOST_PORT
+    server, messages = await start_server(ws_server_address, logger)
     client = ClientReceiver(
-        address=client_address,
+        address=client_receiver_address,
         received=messages,
         reconnect=reconnect,
         timeout=timeout,
@@ -46,6 +45,9 @@ async def main(
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        asyncio.run(main(
+            (CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT),
+            (CONFIG.CLIENT_HOST_IP, CONFIG.CLIENT_HOST_PORT)
+        ))
     except KeyboardInterrupt:
         pass
