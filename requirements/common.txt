@@ -12,5 +12,4 @@ pysocklib==0.3.3
 six==1.16.0
 toml==0.10.2
 typing_extensions==4.7.1
-pysocklib==0.3.2
 websockets==11.0.3
