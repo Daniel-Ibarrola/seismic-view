@@ -2,12 +2,40 @@
 
     Can be used to test the main program.
 """
+import argparse
 import asyncio
 import websockets as ws
-import sys
 import signal
 
-from seismicview import CONFIG
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Websocket client to test the SeismicView's websocket server")
+    parser.add_argument(
+        "--ip",
+        "-i",
+        type=str,
+        default="localhost",
+        help="The ip where the client will connect"
+             " (default localhost)."
+    )
+    parser.add_argument(
+        "--port",
+        "-p",
+        type=int,
+        default=12345,
+        help="The port where the client will connect"
+             " (default 12345)."
+    )
+    parser.add_argument(
+        "--station",
+        "-s",
+        default="S160",
+        help="Name of the station this client will request"
+             " (default 'S160')"
+    )
+    args = parser.parse_args()
+    return args.ip, args.port, args.station
 
 
 async def receive(
@@ -40,15 +68,11 @@ async def stop_client():
 async def main():
     """ Starts a websocket client that will receive data from the requested station.
     """
-    print("Starting Client")
+    ip, port, station = parse_args()
 
-    if len(sys.argv) > 1:
-        station = sys.argv[1]
-    else:
-        raise ValueError("Must pass a station as argument")
-
-    uri = f"ws://{CONFIG.WS_SERVER_HOST_IP}:{CONFIG.WS_SERVER_HOST_PORT}"
+    uri = f"ws://{ip}:{port}"
     async for client in ws.connect(uri):
+        print(f"Client connected to {uri}")
         try:
             await receive(client, station)
         except ws.ConnectionClosed:

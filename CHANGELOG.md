@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0 (1/08/2023)
+
+- Containers use a custom network
+- Added arg parser to `ws_client.py` 
+
 ## v0.2.0 (31/07/2023)
 
 ### Features

@@ -107,7 +107,7 @@ class WSServer:
             await self.send_station_data(msg, self.connections)
 
     async def start(self) -> None:
-        self._logger.info(f"Server listening on {self.host}:{self.port}")
+        self._logger.info(f"{self.__class__.__name__} listening on {self.host}:{self.port}")
         server = await websockets.serve(self.handle_new_connection, self.host, self.port)
 
         try:
