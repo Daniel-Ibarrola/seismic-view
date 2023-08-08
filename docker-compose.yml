@@ -4,7 +4,10 @@ services:
 
   seismicview:
     build:
+      context: .
       dockerfile: DockerFile
+    image: ew-seismicview:latest
+    container_name: earthworm-websocket-server
     entrypoint: [
         "python",
         "/src/seismicview/main.py"
