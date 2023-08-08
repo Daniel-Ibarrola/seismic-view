@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.3.1 (7/08/2023)
+Updated default ports so that the test client can connect to the main program.
+
 ## v0.3.0 (1/08/2023)
 
 - Containers use a custom network

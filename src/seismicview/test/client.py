@@ -111,7 +111,7 @@ class WaveClient(ClientSender):
                         msg,
                         self.msg_end,
                         self._logger,
-                        "WaveServer"
+                        "WaveClient"
                     )
                     if error:
                         return
