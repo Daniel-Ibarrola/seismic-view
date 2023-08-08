@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.2 (7/08/2023)
+- Make file updated with commands description
+- Docker containers use custom names
+- Docker image custom name
+
 ## v0.3.1 (7/08/2023)
 Updated default ports so that the test client can connect to the main program.
 
