@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.3 (9/08/2022)
+- Removed custom network from production deployment leading to errors.
+- Removed logger file handler.
+
 ## v0.3.2 (7/08/2023)
 - Make file updated with commands description
 - Docker containers use custom names

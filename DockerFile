@@ -10,7 +10,5 @@ RUN mkdir -p /logs && \
     pip install -r /requirements/dev.txt && \
     pip install -e .
 
-#ENV HOST_DOMAIN=host.docker.internal:host-gateway
-#RUN pytest /tests/
 
 WORKDIR /src

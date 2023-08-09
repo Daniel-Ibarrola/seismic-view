@@ -18,4 +18,4 @@ down: ## Remove all containers:
 	docker compose down --remove-orphans
 
 logs: ## View the logs
-	docker compose logs --tail=25 app
+	docker compose logs --tail=25 seismicview
