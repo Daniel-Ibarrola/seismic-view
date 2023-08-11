@@ -6,10 +6,3 @@ services:
       - ./tests:/tests
     environment:
       - CONFIG=dev
-    networks:
-      - ew-proxy
-
-networks:
-  ew-proxy:
-    external: true
-    name: earthworm

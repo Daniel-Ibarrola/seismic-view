@@ -49,6 +49,7 @@ if __name__ == "__main__":
         asyncio.run(main(
             (CONFIG.WS_SERVER_HOST_IP, CONFIG.WS_SERVER_HOST_PORT),
             (CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT),
+            reconnect=True,
             timeout=None
         ))
     except KeyboardInterrupt:

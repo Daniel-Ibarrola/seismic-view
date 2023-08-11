@@ -9,13 +9,16 @@ build: ## Build docker image:
 	docker compose build
 
 dev: ## Start in development mode. Server port=13342. WebSockerServer port=13345
-	docker compose up
+	docker compose up -d && docker compose logs -f
 
 up: ## Start in production mode. Server port=13342. WebSockerServer port=13345
 	docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 down: ## Remove all containers:
 	docker compose down --remove-orphans
+
+destroy: ## Remove all containers and images
+	docker compose down --remove-orphans && docker image rm ew-pozo
 
 logs: ## View the logs
 	docker compose logs --tail=25 seismicview
