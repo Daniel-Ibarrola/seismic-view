@@ -20,5 +20,8 @@ down: ## Remove all containers:
 destroy: ## Remove all containers and images
 	docker compose down --remove-orphans && docker image rm ew-pozo
 
+stop:  ## Stop all containers
+	docker compose stop
+
 logs: ## View the logs
 	docker compose logs --tail=25 seismicview

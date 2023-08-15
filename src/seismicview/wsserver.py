@@ -90,7 +90,12 @@ class WSServer:
             self,
             ws: websockets.WebSocketClientProtocol
     ) -> None:
-        station = await ws.recv()
+        try:
+            station = await ws.recv()
+        except websockets.ConnectionClosedError:
+            del self.connections[ws]
+            return
+
         self._logger.info(f"{ws.id} connected. Requested station {station}")
 
         self.connections[ws] = station

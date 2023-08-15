@@ -12,6 +12,13 @@ services:
         "python",
         "/src/seismicview/main.py"
     ]
+    healthcheck:
+      # Check that both ports are listening
+      test: [ "CMD-SHELL",
+              "netstat -tln | grep 13345 && netstat -tln | grep 13342 || exit 1" ]
+      interval: 2m
+      timeout: 10s
+      retries: 3
     environment:
       # Address from which the server receives information
       - SERVER_HOST_IP=seismicview
