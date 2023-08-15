@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.3.5 (15/08/2023)
+- Health checks for containers.
+
 ## v0.3.4 (11/08/2022)
 - Updated pysocklib to 0.3.4 fixing server reconnection errors
 - Removed custom network from development config.
