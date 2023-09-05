@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.3.8 (4/09/2023)
+## v0.3.7 (4/09/2023)
 
 ### Bugfixes
 - Main program will exit if there is an error on the server thread, 
