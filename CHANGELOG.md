@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.8 (4/09/2023)
+
+### Bugfixes
+- Main program will exit if there is an error on the server thread, 
+it uses a watchdog to do so.
+
+### Dependencies
+- Updated pysocklib to 0.5.1. This version should prevent server reconnection errors.
+
 ## v0.3.6 (4/09/2023)
 
 ### Dependencies
