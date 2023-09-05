@@ -18,7 +18,7 @@ down: ## Remove all containers:
 	docker compose down --remove-orphans
 
 destroy: ## Remove all containers and images
-	docker compose down --remove-orphans && docker image rm ew-pozo
+	docker compose down --remove-orphans && docker image rm ew-seismicview
 
 stop:  ## Stop all containers
 	docker compose stop

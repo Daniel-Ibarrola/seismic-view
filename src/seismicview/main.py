@@ -1,6 +1,5 @@
 import asyncio
-from socketlib import ServerReceiver
-from socketlib.utils.logger import get_module_logger
+from socketlib import ServerReceiver, WatchDog, get_module_logger
 from typing import Callable, Optional
 
 from seismicview import CONFIG
@@ -13,7 +12,8 @@ async def main(
         reconnect: bool = False,
         timeout: Optional[float] = 5,
         stop: Optional[Callable[[], bool]] = None,
-        stop_listener: Optional[Callable] = None
+        stop_listener: Optional[Callable] = None,
+        use_watchdog: bool = False
 ):
     """ Starts a server that expects to receive the data of each station in json format.
         This data is then passed to the Websocket Server, which other websocket clients can
@@ -35,10 +35,19 @@ async def main(
 
     with server:
         server.start()
-        
+        if use_watchdog:
+            threads = {
+                "server_receive": server.receive_thread
+            }
+            watchdog = WatchDog(threads, logger)
+            watchdog.start()
+            logger.info(f"Started WatchDog")
+
         ws_server.add_stop_listener(stop_listener)
         await ws_server.start()
 
+        if use_watchdog:
+            watchdog.shutdown()
         server.shutdown()
 
     logger.info("Graceful shutdown")
@@ -50,7 +59,8 @@ if __name__ == "__main__":
             (CONFIG.WS_SERVER_HOST_IP, CONFIG.WS_SERVER_HOST_PORT),
             (CONFIG.SERVER_HOST_IP, CONFIG.SERVER_HOST_PORT),
             reconnect=True,
-            timeout=None
+            timeout=None,
+            use_watchdog=True
         ))
     except KeyboardInterrupt:
         pass
