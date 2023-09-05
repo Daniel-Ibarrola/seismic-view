@@ -23,9 +23,9 @@ def parse_args():
         "--port",
         "-p",
         type=int,
-        default=12345,
+        default=None,
         help="The port where the client will connect"
-             " (default 12345)."
+             " (default None)."
     )
     parser.add_argument(
         "--station",
@@ -70,7 +70,11 @@ async def main():
     """
     ip, port, station = parse_args()
 
-    uri = f"ws://{ip}:{port}"
+    uri = f"ws://{ip}"
+    if port is not None:
+        uri += ":" + str(port)
+
+    print(f"Client will attempt to connect to {uri}")
     async for client in ws.connect(uri):
         print(f"Client connected to {uri}")
         try:

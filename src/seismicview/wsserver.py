@@ -92,7 +92,7 @@ class WSServer:
     ) -> None:
         try:
             station = await ws.recv()
-        except websockets.ConnectionClosedError:
+        except websockets.ConnectionClosed:
             del self.connections[ws]
             return
 

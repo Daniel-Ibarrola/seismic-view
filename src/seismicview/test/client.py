@@ -1,4 +1,4 @@
-""" Server that generates and sends json data for stations.
+""" Client that generates and sends json data for stations.
 
     Can be used to test the main program.
 """

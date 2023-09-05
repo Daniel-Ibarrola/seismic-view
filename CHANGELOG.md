@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.3.6 (4/09/2023)
+
+### Dependencies
+- Updated pysocklib to 0.5.0
+
+### Bugfixes
+- `WSServer` `handle_new_connection` method handles `ConnectionClosed` errors.
+
+### Container
+- Added custom network to development docker compose config.
+
 ## v0.3.5 (15/08/2023)
 - Health checks for containers.
 

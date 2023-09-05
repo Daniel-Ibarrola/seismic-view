@@ -6,3 +6,9 @@ services:
       - ./tests:/tests
     environment:
       - CONFIG=dev
+    networks:
+      - earthworm-net
+
+networks:
+  earthworm-net:
+    external: true
