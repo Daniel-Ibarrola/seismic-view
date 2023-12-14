@@ -1,0 +1,12 @@
+# base
+FROM python:3.11-alpine
+
+COPY pyproject.toml /pyproject.toml
+COPY requirements /requirements/
+COPY src /src/
+
+RUN mkdir -p /logs && \
+    pip install -r /requirements/common.txt && \
+    pip install -e .
+
+WORKDIR /src

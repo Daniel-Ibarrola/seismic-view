@@ -88,8 +88,5 @@ record.txt
 # Data file
 *.csv
 
-#pycharm
-.idea/
-
 # This repo
 temp/

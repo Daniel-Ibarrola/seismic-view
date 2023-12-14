@@ -12,7 +12,7 @@ dev: ## Start in development mode. Server port=13342. WebSockerServer port=13345
 	docker compose up -d && docker compose logs -f
 
 up: ## Start in production mode. Server port=13342. WebSockerServer port=13345
-	docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+	docker compose -f docker-compose.prod.yml up -d
 
 down: ## Remove all containers:
 	docker compose down --remove-orphans
