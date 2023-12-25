@@ -25,3 +25,6 @@ stop:  ## Stop all containers
 
 logs: ## View the logs
 	docker compose logs --tail=25 seismicview
+
+server-tests: ## Test the server
+	docker compose run --rm --no-deps --entrypoint=pytest ew-viewer-ws /tests/

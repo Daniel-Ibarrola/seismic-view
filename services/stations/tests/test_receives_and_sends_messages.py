@@ -28,6 +28,11 @@ class TestMain:
 
     @pytest_asyncio.fixture
     async def ws_server(self):
+        """ Starts the websocket and receiver servers."""
+        logger = get_module_logger("WSServer", "dev", use_file_handler=False)
+        logger.info(f"Starting WS Server with address: {self.ws_server_address}")
+        logger.info(f"Starting Server Receiver with address: {self.server_receiver_address}")
+
         stop_event = threading.Event()
         asyncio.ensure_future(
             main(
@@ -46,7 +51,11 @@ class TestMain:
 
     @pytest.fixture
     def client_sender(self) -> ClientSender:
+        """ Start the client that will send data to the server receiver.
+        """
         logger = get_module_logger("ClientSender", "dev", use_file_handler=False)
+        logger.info(f"Starting client sender, address: {self.server_receiver_address}")
+
         client = ClientSender(
             address=self.server_receiver_address,
             reconnect=False,
@@ -80,7 +89,7 @@ class TestMain:
 
     @pytest.mark.timeout(5)
     @pytest.mark.asyncio
-    async def test_multiple_clients(
+    async def test_multiple_clients_connect_and_receive_data_from_requested_station(
             self, client_sender, ws_server
     ):
         client_sender.connect()
