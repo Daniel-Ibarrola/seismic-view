@@ -31,3 +31,12 @@ services:
     ports:
       - "13342:13342"
       - "13345:13345"
+
+  ew-viewer-client:
+    build:
+      context: ./services/client
+      dockerfile: Dockerfile.prod
+    image: ew-viewer-client-prod:latest
+    container_name: earthworm-viewer-client-dev
+    ports:
+      - "80:80"

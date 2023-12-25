@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  grapher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: [ "npm", "run", "dev" ]
+    image: ew-graph:latest
+    container_name: earthworm-grapher
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+    ports:
+      - "5173:5173"
