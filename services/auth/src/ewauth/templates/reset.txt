@@ -1,0 +1,8 @@
+Saludos,
+
+Para resetear su password haga click en el siguiente link:
+
+{{ url }}
+
+Atentamente,
+CIRES

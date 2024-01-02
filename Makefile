@@ -29,6 +29,8 @@ logs: ## View the logs
 server-tests: ## Test the server
 	docker compose run --rm --no-deps --entrypoint=pytest ew-viewer-ws /tests/
 
-
 client-tests: ## Test the client
 	docker compose run --rm --no-deps --entrypoint="npm run test" ew-viewer-client
+
+auth-tests: ## Test the auth server
+	docker compose run --rm --no-deps --entrypoint=pytest ew-viewer-auth /tests/

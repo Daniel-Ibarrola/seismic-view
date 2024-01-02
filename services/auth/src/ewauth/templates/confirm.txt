@@ -1,0 +1,8 @@
+Saludos,
+
+Para confirmar su cuenta haga click en el siguiente link:
+
+{{ url }}
+
+Atentamente,
+CIRES
