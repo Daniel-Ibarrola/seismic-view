@@ -18,7 +18,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build container
-      run: docker compose up -d
+      run: docker compose up ew-viewer-ws -d
 
     - name: Run tests
       run: docker compose run --rm --no-deps --entrypoint=pytest ew-viewer-ws /tests/
+
+  test-client:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build container
+        run: docker compose up ew-viewer-client -d
+
+      - name: Run tests
+        run: ocker compose run --rm --no-deps --entrypoint="npm run test-ci" ew-viewer-client

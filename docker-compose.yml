@@ -45,7 +45,6 @@ services:
     container_name: earthworm-viewer-client-dev
     volumes:
       - ./services/client/src:/app/src
-      - ./services/client/test:/app/tests
       - ./services/client/node_modules:/app/node_modules
       - ./services/client/vite.config.js:/app/vite.config.js
     ports:
