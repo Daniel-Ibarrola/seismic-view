@@ -69,6 +69,24 @@ services:
     ports:
       - "5000:80"
 
+  wave-client:
+    build:
+      context: ./services/stations
+      dockerfile: DockerFile
+    image: ew-viewer-ws-dev:latest
+    container_name: wave-client-dev
+    entrypoint: [
+      "python",
+      "/src/seismicview/test/client.py"
+    ]
+    environment:
+      - CONFIG=dev
+      # Address from which the server receives information
+      - SERVER_HOST_IP=ew-viewer-ws
+      - SERVER_HOST_PORT=13342
+    volumes:
+      - ./services/stations/src:/src
+
 
 volumes:
   db_volume:
