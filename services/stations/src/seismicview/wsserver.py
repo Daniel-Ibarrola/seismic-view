@@ -93,7 +93,7 @@ class WSServer:
         try:
             station = await ws.recv()
         except websockets.ConnectionClosed:
-            del self.connections[ws]
+            self._delete_connection(ws)
             return
 
         self._logger.info(f"{ws.id} connected. Requested station {station}")
@@ -104,7 +104,7 @@ class WSServer:
             await ws.wait_closed()
         finally:
             self._logger.info(f"Disconnected {ws.id}")
-            del self.connections[ws]
+            self._delete_connection(ws)
 
     async def send(self) -> None:
         while True:
@@ -122,6 +122,12 @@ class WSServer:
             server.close()
             await server.wait_closed()
             self._logger.info("Server stopped")
+
+    def _delete_connection(self, connection: websockets.WebSocketClientProtocol):
+        try:
+            del self.connections[connection]
+        except KeyError:
+            pass
 
 
 async def start_server(address: tuple[str, int], logger: logging.Logger) -> tuple[WSServer, janus.SyncQueue]:
