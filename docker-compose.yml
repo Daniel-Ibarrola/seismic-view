@@ -62,12 +62,18 @@ services:
       - ./services/auth/.env
     command: >
       sh -c "
+        flask wait-for-db &&
         flask db upgrade &&
         flask run --host=0.0.0.0 --port=80"
     environment:
       - FLASK_APP=ewauth/app.py
       - FLASK_DEBUG=1
       - PYTHONUNBUFFERED=1
+      - DB_HOST=postgres
+      - DB_USER=ewauth
+      - DB_NAME=ewauth
+      - DB_PASSWORD=abc123
+      - DB_PORT=5432
       - API_HOST=ew-viewer-auth
       - CONFIG=dev
     healthcheck:
@@ -75,11 +81,23 @@ services:
       interval: 1m
       timeout: 10s
       retries: 3
+    depends_on:
+      - postgres
     volumes:
       - ./services/auth/src:/src
       - ./services/auth/tests:/tests
     ports:
       - "5000:80"
+
+  postgres:
+    image: postgres:15.2-alpine
+    container_name: ew-auth-db
+    environment:
+      # Note user and db name will be the same
+      - POSTGRES_USER=ewauth
+      - POSTGRES_PASSWORD=abc123
+    ports:
+      - "54321:5432"
 
   wave-client:
     build:

@@ -3,22 +3,6 @@ import logging
 import re
 
 
-def get_api_url() -> str:
-    host = os.environ.get("API_HOST", "localhost")
-    port = 5000 if host == "localhost" else 80
-    return f"http://{host}:{port}"
-
-
-def get_db_path(filename: str) -> str:
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    full_path = os.path.join(base_path, filename + ".db")
-    return f"sqlite:///{full_path}"
-
-
-class MissingEnvVariableError(ValueError):
-    pass
-
-
 def get_env_variable(name: str) -> str:
     """ Check that an environment variable is set in production mode.
     """
@@ -31,6 +15,34 @@ def get_env_variable(name: str) -> str:
             )
         return value
     return ""
+
+
+def get_api_url() -> str:
+    host = os.environ.get("API_HOST", "localhost")
+    port = 5000 if host == "localhost" else 80
+    return f"http://{host}:{port}"
+
+
+def get_dev_postgres_uri(host: str = "localhost") -> str:
+    password = os.environ.get("DB_PASSWORD", "abc123")
+    port = os.environ.get("DB_PORT", 54321)
+    user = os.environ.get("DB_USER", "ewauth")
+    db_name = user
+    return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+
+
+def get_postgres_uri() -> str:
+    """ Get the postgres uri for the production database. """
+    host = get_env_variable("DB_HOST")
+    user = get_env_variable("DB_USER")
+    password = get_env_variable("DB_PASSWORD")
+    port = get_env_variable("DB_PORT")
+    db_name = get_env_variable("DB_NAME")
+    return f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+
+
+class MissingEnvVariableError(ValueError):
+    pass
 
 
 def get_emails_file_path() -> str:
@@ -50,7 +62,9 @@ class Configuration:
     TESTING = True
     # SQL alchemy config
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = ""
+    SQLALCHEMY_DATABASE_URI = get_dev_postgres_uri(
+        host=os.environ.get("DB_HOST", "localhost")
+    )
     # Logging
     LOGGING_LEVEL = logging.WARNING
     LOG_FILES = False
@@ -77,7 +91,6 @@ class DevAPIConfig(Configuration):
         database is expected to be constantly added, deleted or updated.
     """
     NAME = "dev"
-    SQLALCHEMY_DATABASE_URI = get_db_path("users-dev")
     LOGGING_LEVEL = logging.DEBUG
 
 
@@ -99,7 +112,7 @@ class ProdConfig(Configuration):
     NAME = "prod"
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = f"sqlite:////db/users.db"
+    SQLALCHEMY_DATABASE_URI = get_postgres_uri()
     SECRET_KEY = get_env_variable("SECRET_KEY")
     DOMAIN_NAME = get_env_variable("DOMAIN_NAME")
 

@@ -62,26 +62,40 @@ services:
     image: ew-viewer-auth-prod:latest
     container_name: earthworm-viewer-auth-prod
     env_file:
-      - ./services/auth/.env
+      - ./services/auth/.env.prod
     restart: unless-stopped
     command: >
       sh -c "
+        flask wait-for-db &&
         flask db upgrade &&
         gunicorn --bind 0.0.0.0:5000 ewauth.wsgi:app"
     environment:
       - FLASK_APP=ewauth/app.py
-      - DOMAIN_NAME=https://racm-monitor.cires-ac.net
+      - DB_HOST=postgres
+      - DB_USER=ewauth
+      - DB_NAME=ewauth
+      - DB_PASSWORD=abc123
+      - DB_PORT=5432
       - CONFIG=prod
+    depends_on:
+      - postgres
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:5000/" ]
       interval: 3m
       timeout: 10s
       retries: 3
-    volumes:
-      - db_volume:/db/
     ports:
       - "5000:80"
 
-
-volumes:
-  db_volume:
+  postgres:
+    build:
+      context: ./services/cap-api/db
+      dockerfile: Dockerfile
+    restart: always
+    image: rss-db:latest
+    container_name: rss-db
+    env_file:
+      - services/cap-api/.env
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./pg_backup:/pg_backup/

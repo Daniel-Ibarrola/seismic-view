@@ -1,9 +1,10 @@
 import click
 import getpass
+
 from ewauth import CONFIG, create_app, db
 from ewauth.models import Email, User
 from ewauth.config import DevAPIConfig
-from ewauth.utils import clear_database, insert_user, insert_email
+from ewauth.utils import clear_database, insert_user, insert_email, wait_for_postgres
 
 
 app = create_app(CONFIG)
@@ -24,6 +25,17 @@ def cli_authenticate() -> bool:
     auth_password = getpass.getpass("Enter your password: ")
     user = User.get_user(auth_email)
     return user is not None and user.verify_password(auth_password)
+
+
+@app.cli.command("wait-for-db")
+def wait_for_db():
+    """ Wait for the database to start. """
+    postgres_uri = CONFIG.SQLALCHEMY_DATABASE_URI
+    if "dev" in CONFIG.NAME:
+        print(f"Attempting to connect to database in {postgres_uri}.")
+    else:
+        print(f"Attempting to connect to database.")
+    wait_for_postgres(postgres_uri)
 
 
 @app.cli.command("add-email")
