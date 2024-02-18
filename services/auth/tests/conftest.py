@@ -3,10 +3,10 @@ import pytest
 import requests
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
-from werkzeug.security import generate_password_hash
 from typing import Generator
 
 from ewauth import config, create_app, db
+from ewauth.utils import add_admin
 from ewauth.services.api_client import APIClient
 
 
@@ -29,7 +29,7 @@ def create_app_and_db(config_name: str):
     app_context = app.app_context()
     app_context.push()
     db.create_all()
-
+    add_admin(app)
     return app_context
 
 
@@ -66,23 +66,8 @@ def get_emails(session: Session):
     return results.scalars().all()
 
 
-def insert_fake_user(session: Session, auth: tuple[str, str], confirmed: bool) -> None:
-    """ Insert a user into the database, so we can pass the http auth"""
-    email, password = auth
-    if email not in get_users_emails(session):
-        password_hash = generate_password_hash(password)
-        session.execute(
-            text(
-                    "INSERT INTO users (email, password_hash, confirmed) VALUES "
-                    "(:email, :password_hash, :confirmed )"
-                 ),
-            dict(email=email, password_hash=password_hash, confirmed=confirmed)
-        )
-        session.commit()
-
-
 def insert_valid_emails(session: Session):
-    emails = ["daniel@example.com", "triton@example.com"]
+    emails = ["daniel@example.com"]
     valid_emails = get_emails(session)
 
     for email in emails:
@@ -107,12 +92,12 @@ def clear_database(session: Session) -> None:
 
 @pytest.fixture
 def sqlite_session() -> Generator[Session, None, None]:
-    engine = create_engine(config.DevAPIConfig.SQLALCHEMY_DATABASE_URI)
+    dev_config = config.DevAPIConfig
+
+    engine = create_engine(dev_config.SQLALCHEMY_DATABASE_URI)
     session = sessionmaker(bind=engine)()
 
-    credentials = "triton@example.com", "6MonkeysRLooking^"
     insert_valid_emails(session)
-    insert_fake_user(session, credentials, True)
     clear_database(session)
 
     yield session
@@ -123,7 +108,10 @@ def sqlite_session() -> Generator[Session, None, None]:
 
 @pytest.fixture
 def client() -> APIClient:
-    credentials = "triton@example.com", "6MonkeysRLooking^"
+    """ Returns a client with the credentials of the admin user.
+    """
+    dev_config = config.DevAPIConfig
+    credentials = dev_config.ADMIN_USER, dev_config.ADMIN_PASSWORD
     api_client = APIClient(credentials)
     res = api_client.request_token()
     assert res.ok, res.json()["message"]

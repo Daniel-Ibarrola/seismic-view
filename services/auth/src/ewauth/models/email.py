@@ -10,6 +10,8 @@ class Email(db.Model):
 
     @staticmethod
     def is_email_valid(address: str) -> bool:
+        """ Returns true if the given email address is stored in the database.
+        """
         result = db.session.execute(
             db.select(Email).filter_by(email=address)
         ).scalar_one_or_none()

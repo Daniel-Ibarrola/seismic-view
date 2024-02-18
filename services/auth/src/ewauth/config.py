@@ -1,6 +1,5 @@
 import os
 import logging
-import re
 
 
 def get_env_variable(name: str) -> str:
@@ -74,6 +73,9 @@ class Configuration:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "triton@gmail.com")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "dog")
+    # Admin
+    ADMIN_USER = os.environ.get("ADMIN_USER", "admin@example.com")
+    ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "dog123")
 
     @staticmethod
     def init_app(app):
@@ -116,6 +118,9 @@ class ProdConfig(Configuration):
 
     MAIL_USERNAME = get_env_variable('MAIL_USERNAME')
     MAIL_PASSWORD = get_env_variable('MAIL_PASSWORD')
+
+    ADMIN_USER = get_env_variable("ADMIN_USER")
+    ADMIN_PASSWORD = get_env_variable("ADMIN_PASSWORD")
 
 
 def get_app_config(config_name: str) -> Configuration:

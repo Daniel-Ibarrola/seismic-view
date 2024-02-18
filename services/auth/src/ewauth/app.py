@@ -1,10 +1,12 @@
-import click
 import getpass
+import time
+
+import click
 
 from ewauth import CONFIG, create_app, db
 from ewauth.models import Email, User
 from ewauth.config import DevAPIConfig
-from ewauth.utils import clear_database, insert_user, insert_email, wait_for_postgres
+from ewauth.utils import add_admin, clear_database, wait_for_postgres
 
 
 app = create_app(CONFIG)
@@ -32,10 +34,11 @@ def wait_for_db():
     """ Wait for the database to start. """
     postgres_uri = CONFIG.SQLALCHEMY_DATABASE_URI
     if "dev" in CONFIG.NAME:
-        print(f"Attempting to connect to database in {postgres_uri}.")
+        print(f"Attempting to connect to database in {postgres_uri}...")
     else:
-        print(f"Attempting to connect to database.")
+        print(f"Attempting to connect to database...")
     wait_for_postgres(postgres_uri)
+    time.sleep(0.5)
 
 
 @app.cli.command("add-email")
@@ -45,11 +48,7 @@ def add_email(email: str):
 
         Requires authentication.
     """
-    if cli_authenticate():
-        insert_email(email)
-        print(f"Inserted new email {email}")
-    else:
-        print("Invalid email or password")
+    pass
 
 
 @app.cli.command("add-user")
@@ -139,7 +138,5 @@ def insert_admin():
 
         Only use in development mode.
     """
-    if isinstance(CONFIG, DevAPIConfig):
-        credentials = insert_user()
-        print(f"Inserted user with credentials {credentials}")
-    raise ValueError("Cannot insert users in production mode")
+    add_admin(app)
+    print("Inserted admin user")

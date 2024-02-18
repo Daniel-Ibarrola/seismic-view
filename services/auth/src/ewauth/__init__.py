@@ -7,7 +7,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 from ewauth import config
 
-
 CONFIG = config.get_app_config(os.environ.get("CONFIG", "dev"))
 
 
@@ -15,7 +14,7 @@ db = SQLAlchemy()
 mail = Mail()
 
 
-def create_app(app_config: config.Configuration):
+def create_app(app_config: config.Configuration) -> Flask:
     app = Flask(__name__)
     app.config.from_object(app_config)
     app_config.init_app(app)
@@ -29,4 +28,5 @@ def create_app(app_config: config.Configuration):
     if not isinstance(app_config, config.ProdConfig):
         CORS(app)
     Migrate(app, db)
+
     return app

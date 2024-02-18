@@ -2,7 +2,7 @@ import time
 import pytest
 
 from ewauth.app import db
-
+from ewauth.config import DevAPIConfig
 from ewauth.models import Email
 from ewauth.models.email_status import EmailStatus
 from ewauth.models.user import User, ValidationError
@@ -153,3 +153,25 @@ class TestEmailValidation:
         email_address = "daniel@example.com"
         self.add_valid_email(email_address)
         assert User.check_email_status(email_address) == EmailStatus.VALID
+
+
+class TestAdminUser:
+
+    @pytest.mark.usefixtures("in_memory_db")
+    def test_add_admin_user(self):
+        # Admin is added in app creation
+        admin_email = DevAPIConfig.ADMIN_USER
+        admin_password = DevAPIConfig.ADMIN_PASSWORD
+
+        user = User.get_user(admin_email)
+        assert user is not None
+
+        assert user.verify_password(admin_password)
+
+    # @pytest.mark.usefixtures("in_memory_db")
+    # def test_user_is_admin(self):
+    #     pass
+    #
+    # @pytest.mark.usefixtures("in_memory_db")
+    # def test_user_is_not_admin(self):
+    #     pass

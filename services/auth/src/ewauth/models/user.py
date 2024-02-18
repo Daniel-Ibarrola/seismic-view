@@ -1,7 +1,8 @@
 import re
+from typing import Union, Optional
+
 from itsdangerous import URLSafeTimedSerializer
 from itsdangerous.exc import SignatureExpired, BadSignature
-from typing import Union, Optional
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ewauth import CONFIG, db
@@ -139,3 +140,6 @@ class User(db.Model):
         return db.session.execute(
             db.select(User).filter_by(email=email)
         ).scalar_one_or_none()
+
+    def __repr__(self):
+        return f"User(email={self.email})"

@@ -50,7 +50,8 @@ class APIClient:
             json={
                 "email": email,
                 "password": password,
-            }
+            },
+            auth=self.credentials
         )
 
     def request_account_confirmation(self) -> requests.Response:
