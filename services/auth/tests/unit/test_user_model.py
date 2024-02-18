@@ -1,7 +1,11 @@
 import time
 import pytest
+
 from ewauth.app import db
-from ewauth.models.user import User, ValidationError, Email
+
+from ewauth.models import Email
+from ewauth.models.email_status import EmailStatus
+from ewauth.models.user import User, ValidationError
 
 
 class TestUserModel:
@@ -123,26 +127,29 @@ class TestUserValidation:
 class TestEmailValidation:
 
     @staticmethod
-    def valid_emails() -> list[str]:
-        return ["daniel@example.com"]
+    def add_valid_email(email_address: str):
+        email = Email(email=email_address)
+        db.session.add(email)
+        db.session.commit()
 
     @pytest.mark.usefixtures("in_memory_db")
     def test_email_in_use(self):
-        email = "daniel@example.com"
-        Email.valid_emails = self.valid_emails
+        email_address = "daniel@example.com"
 
-        user = User(email=email, password="6MonkeysRLooking^")
+        self.add_valid_email(email_address)
+
+        user = User(email=email_address, password="6MonkeysRLooking^")
         db.session.add(user)
         db.session.commit()
 
-        assert User.is_email_valid(email) == Email.IN_USE
+        assert User.check_email_status(email_address) == EmailStatus.IN_USE
 
+    @pytest.mark.usefixtures("in_memory_db")
     def test_email_not_in_list(self):
-        Email.valid_emails = self.valid_emails
-        assert User.is_email_valid("triton@example.com") == Email.INVALID
+        assert User.check_email_status("triton@example.com") == EmailStatus.INVALID
 
     @pytest.mark.usefixtures("in_memory_db")
     def test_valid_email(self):
-        email = "daniel@example.com"
-        Email.valid_emails = self.valid_emails
-        assert User.is_email_valid(email) == Email.VALID
+        email_address = "daniel@example.com"
+        self.add_valid_email(email_address)
+        assert User.check_email_status(email_address) == EmailStatus.VALID

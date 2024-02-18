@@ -2,7 +2,7 @@ from flask import g, jsonify, request
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 
 from ewauth import CONFIG, db
-from ewauth.models.user import User, Email
+from ewauth.models.user import User, EmailStatus
 from ewauth.api import api, errors, mail
 
 auth = HTTPBasicAuth()
@@ -56,8 +56,8 @@ def get_token():
 @api.route("/new_user/", methods=["POST"])
 def add_new_user():
     email, password = request.json["email"], request.json["password"]
-    email_valid = User.is_email_valid(email)
-    if email_valid == Email.VALID:
+    email_valid = User.check_email_status(email)
+    if email_valid == EmailStatus.VALID:
         user = User(email=email, password=password)
         db.session.add(user)
         db.session.commit()
@@ -67,8 +67,8 @@ def add_new_user():
         return jsonify({
             "email": email
         })
-    elif email_valid == Email.IN_USE:
-        return errors.bad_request("email already in use")
+    elif email_valid == EmailStatus.IN_USE:
+        return errors.bad_request("Email already in use")
     else:
         return errors.unauthorized("Invalid email")
 
@@ -77,11 +77,11 @@ def add_new_user():
 @auth.login_required()
 def confirm_account(token):
     if g.current_user.confirmed:
-        return jsonify({"confirmed": "user already confirmed"})
+        return jsonify({"confirmed": "User already confirmed"})
     if g.current_user.confirm(token):
         db.session.commit()
         return jsonify({"confirmed": "account confirmed"})
-    return errors.bad_request("invalid or expired link")
+    return errors.bad_request("Invalid or expired link")
 
 
 @api.route("/confirm")
@@ -113,7 +113,7 @@ def request_password_reset():
     if token:
         mail.send_reset_password_email(email, token)
         return jsonify({"email": email})
-    return errors.not_found("email is not associated with an account")
+    return errors.not_found("Email is not associated with an account")
 
 
 @api.route("/reset/<token>", methods=["POST"])
@@ -122,4 +122,4 @@ def reset_password(token):
     if User.reset_password(token, password):
         db.session.commit()
         return "OK", 201
-    return errors.bad_request("invalid or expired link")
+    return errors.bad_request("Invalid or expired link")

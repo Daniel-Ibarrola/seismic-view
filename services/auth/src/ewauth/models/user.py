@@ -5,6 +5,8 @@ from typing import Union, Optional
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ewauth import CONFIG, db
+from ewauth.models.email import Email
+from ewauth.models.email_status import EmailStatus
 
 
 class ValidationError(ValueError):
@@ -17,16 +19,6 @@ class EmailValidationError(ValidationError):
 
 class PasswordValidationError(ValidationError):
     pass
-
-
-class Email:
-    VALID = 0
-    IN_USE = 1
-    INVALID = 2
-
-    @staticmethod
-    def valid_emails() -> list[str]:
-        return CONFIG.valid_emails()
 
 
 class User(db.Model):
@@ -96,20 +88,20 @@ class User(db.Model):
         return User._verify_token(token, "confirm", expiration)
 
     @staticmethod
-    def is_email_valid(email: str, check_valid_emails: bool = True) -> int:
+    def check_email_status(email: str, check_valid_emails: bool = True) -> EmailStatus:
         """ Check if the given email is valid and a new user can be
             created with it.
         """
-        if check_valid_emails and email not in Email.valid_emails():
-            return Email.INVALID
+        if check_valid_emails and not Email.is_email_valid(email):
+            return EmailStatus.INVALID
 
         result = db.session.execute(
             db.select(User).filter_by(email=email)
         ).scalar_one_or_none()
         if result is not None:
-            return Email.IN_USE
+            return EmailStatus.IN_USE
 
-        return Email.VALID
+        return EmailStatus.VALID
 
     def confirm(self, token: Union[bytes, str]) -> bool:
         user = self.verify_auth_token(token)

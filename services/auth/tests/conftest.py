@@ -57,6 +57,15 @@ def get_users_emails(session: Session):
     return results.scalars().all()
 
 
+def get_emails(session: Session):
+    results = session.execute(
+        text(
+            "SELECT email FROM emails "
+        ),
+    )
+    return results.scalars().all()
+
+
 def insert_fake_user(session: Session, auth: tuple[str, str], confirmed: bool) -> None:
     """ Insert a user into the database, so we can pass the http auth"""
     email, password = auth
@@ -70,6 +79,22 @@ def insert_fake_user(session: Session, auth: tuple[str, str], confirmed: bool) -
             dict(email=email, password_hash=password_hash, confirmed=confirmed)
         )
         session.commit()
+
+
+def insert_valid_emails(session: Session):
+    emails = ["daniel@example.com", "triton@example.com"]
+    valid_emails = get_emails(session)
+
+    for email in emails:
+        if email not in valid_emails:
+            session.execute(
+                text(
+                    "INSERT INTO emails (email) VALUES "
+                    "(:email)"
+                ),
+                dict(email=email)
+            )
+            session.commit()
 
 
 def clear_database(session: Session) -> None:
@@ -86,6 +111,7 @@ def sqlite_session() -> Generator[Session, None, None]:
     session = sessionmaker(bind=engine)()
 
     credentials = "triton@example.com", "6MonkeysRLooking^"
+    insert_valid_emails(session)
     insert_fake_user(session, credentials, True)
     clear_database(session)
 

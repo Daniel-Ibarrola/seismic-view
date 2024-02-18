@@ -61,7 +61,7 @@ def add_user(email: str, password: str):
         Requires authentication.
     """
     if cli_authenticate():
-        if User.is_email_valid(email, False) == Email.VALID:
+        if User.check_email_status(email, False) == Email.VALID:
             new_user = User(email=email, password=password, confirmed=True)
             db.session.add(new_user)
             db.session.commit()

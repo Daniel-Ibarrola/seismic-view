@@ -79,10 +79,6 @@ class Configuration:
     def init_app(app):
         pass
 
-    @staticmethod
-    def valid_emails() -> list[str]:
-        return ["triton@example.com", "daniel@example.com", "daniel.ibarrola.sanchez@gmail.com"]
-
 
 class DevAPIConfig(Configuration):
     """ Configuration used for developing the API and the main voltage module.
@@ -120,18 +116,6 @@ class ProdConfig(Configuration):
 
     MAIL_USERNAME = get_env_variable('MAIL_USERNAME')
     MAIL_PASSWORD = get_env_variable('MAIL_PASSWORD')
-
-    @staticmethod
-    def valid_emails() -> list[str]:
-        email_list = []
-        pattern = r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+'
-        with open(get_emails_file_path()) as fp:
-            for line in fp.readlines():
-                if not line.startswith("#"):
-                    email = line.strip()
-                    if re.search(pattern, email):
-                        email_list.append(email)
-        return email_list
 
 
 def get_app_config(config_name: str) -> Configuration:
