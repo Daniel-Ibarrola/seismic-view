@@ -10,7 +10,7 @@ dev: ## Start in development mode. Server port=13342. WebSockerServer port=13345
 	docker compose up -d && docker compose logs -f
 
 staging: ## Start in staging mode (http)
-    docker compose up -f docker-compose.staging.yml up -d
+    docker compose -f docker-compose.staging.yml up -d
 
 prod: ## Start in production mode (https).
 	docker compose -f docker-compose.prod.yml up -d
