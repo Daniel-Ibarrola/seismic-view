@@ -168,10 +168,16 @@ class TestAdminUser:
 
         assert user.verify_password(admin_password)
 
-    # @pytest.mark.usefixtures("in_memory_db")
-    # def test_user_is_admin(self):
-    #     pass
-    #
-    # @pytest.mark.usefixtures("in_memory_db")
-    # def test_user_is_not_admin(self):
-    #     pass
+    @pytest.mark.usefixtures("in_memory_db")
+    def test_user_is_admin(self):
+        admin_email = DevAPIConfig.ADMIN_USER
+        admin = User.get_user(admin_email)
+        assert admin.is_admin is True
+
+    @pytest.mark.usefixtures("in_memory_db")
+    def test_user_is_not_admin(self):
+        user = User(email="daniel@example.com", password="dog123")
+        db.session.add(user)
+        db.session.commit()
+
+        assert user.is_admin is False

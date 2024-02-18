@@ -45,6 +45,10 @@ class User(db.Model):
     def verify_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def is_admin(self) -> bool:
+        return self.email == CONFIG.ADMIN_USER
+
     @staticmethod
     def validate_email(email: str) -> None:
         """ Validate if the given string is an email. """

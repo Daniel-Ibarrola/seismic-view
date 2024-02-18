@@ -68,7 +68,7 @@ def get_token():
 
 @api.route("/new_user/", methods=["POST"])
 @auth.login_required()
-# @admin_required
+@admin_required
 def add_new_user():
     email, password = request.json["email"], request.json["password"]
     email_status = User.check_email_status(email)
