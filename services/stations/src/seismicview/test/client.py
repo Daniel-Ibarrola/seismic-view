@@ -12,6 +12,7 @@ import sys
 from typing import Callable, Optional
 
 from seismicview import CONFIG
+from seismicview.test.wave_generator import WaveGenerator
 
 
 STATIONS = {
@@ -82,6 +83,7 @@ class WaveClient(ClientSender):
             stop=stop,
             logger=logger)
         self.stations = self.get_stations(n_stations)
+        self._wave_gen = WaveGenerator()
 
     @staticmethod
     def get_stations(n_stations: int) -> dict[str, set[str]]:
@@ -96,15 +98,9 @@ class WaveClient(ClientSender):
     def generate_and_send_waves(self) -> None:
         while not self._stop():
             for station, channels in STATIONS.items():
+                values = next(self._wave_gen)
                 for ch in channels:
-                    wave = {
-                        "station": station,
-                        "channel":  ch,
-                        "min": 1.0,
-                        "max": 2.0,
-                        "avg": 0.5,
-                        "trace": [1., 2., 3.]
-                    }
+                    wave = self._wave_gen.get_wave_stats(station, ch, values)
                     msg = json.dumps(wave)
                     error = send_msg(
                         self._socket,
