@@ -55,6 +55,7 @@ services:
       sh -c "
         flask wait-for-db &&
         flask db upgrade &&
+        flask insert-admin &&
         gunicorn --bind 0.0.0.0:5000 ewauth.wsgi:app"
     environment:
       - FLASK_APP=ewauth/app.py

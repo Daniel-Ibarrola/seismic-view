@@ -55,6 +55,9 @@ def auth_error():
     return errors.unauthorized("Invalid credentials")
 
 
+# TODO: route to add emails
+
+
 @api.route("/tokens/", methods=["POST"])
 @auth.login_required()
 def get_token():
