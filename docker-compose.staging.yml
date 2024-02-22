@@ -5,7 +5,7 @@ services:
   ew-viewer-ws:
     build:
       context: ./services/stations
-      dockerfile: DockerFile.prod
+      dockerfile: Dockerfile.prod
     image: ew-viewer-ws-prod:latest
     container_name: earthworm-websocket-server-prod
     entrypoint: [
@@ -37,7 +37,7 @@ services:
       context: ./services/client
       dockerfile: Dockerfile.staging
     image: ew-viewer-client-staging:latest
-    container_name: earthworm-viewer-client-dev
+    container_name: earthworm-viewer-client-staging
     command: "nginx -g \"daemon off;\""
     depends_on:
       - ew-viewer-auth
@@ -48,7 +48,7 @@ services:
   ew-viewer-auth:
     build:
       context: ./services/auth
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     image: ew-viewer-auth-prod:latest
     container_name: earthworm-viewer-auth-prod
     env_file:
@@ -84,7 +84,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     image: ew_auth-db:latest
-    container_name: rss-db
+    container_name: ew-auth-db
     environment:
       - POSTGRES_USER=ewauth
       - POSTGRES_PASSWORD=abc123
@@ -95,7 +95,7 @@ services:
   wave-client:
     build:
       context: ./services/stations
-      dockerfile: DockerFile
+      dockerfile: Dockerfile
     image: ew-viewer-ws-dev:latest
     container_name: wave-client-dev
     entrypoint: [

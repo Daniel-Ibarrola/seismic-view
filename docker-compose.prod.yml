@@ -5,7 +5,7 @@ services:
   ew-viewer-ws:
     build:
       context: ./services/stations
-      dockerfile: DockerFile.prod
+      dockerfile: Dockerfile.prod
     image: ew-viewer-ws-prod:latest
     container_name: earthworm-websocket-server-prod
     entrypoint: [
@@ -58,7 +58,7 @@ services:
   ew-viewer-auth:
     build:
       context: ./services/auth
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     image: ew-viewer-auth-prod:latest
     container_name: earthworm-viewer-auth-prod
     env_file:
@@ -94,9 +94,9 @@ services:
       dockerfile: Dockerfile
     restart: always
     image: ew_auth-db:latest
-    container_name: rss-db
+    container_name: ew-auth-db
     env_file:
-      - services/cap-api/.env.prod
+      - services/auth/.env.prod
     environment:
       - POSTGRES_USER=ewauth
     volumes:

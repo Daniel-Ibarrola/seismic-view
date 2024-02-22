@@ -1,23 +1,10 @@
-// Websocket API
-
-const getWebSocket = () => {
-  if (import.meta.env.DEV){
-      return "ws://localhost:13345";
-  }
-  // TODO: use env variables
-  return "wss://racm-monitor.cires-ac.net/wsocket/";
-    // Below config works locally
-  // return "wss://localhost/wsocket/";
-}
-
-export const WebsocketUri = getWebSocket();
+export const WebsocketUri = import.meta.env.VITE_WEBSOCKET_DOMAIN;
 
 // Auth API
-export const baseUrl = "/api/v1";
+export const baseUrl = import.meta.env.VITE_API_DOMAIN + "/api/v1";
 // Auth endpoints
 export const changePasswordUrl = baseUrl + "/change_password/";
 export const confirmUrl = baseUrl + "/confirm/"
-export const stationsUrl = baseUrl + "/stations/";
 export const tokensUrl = baseUrl + "/tokens/";
 export const registerUrl = baseUrl + "/new_user/";
 export const reconfirmUrl = baseUrl + "/confirm";

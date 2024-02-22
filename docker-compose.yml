@@ -5,7 +5,7 @@ services:
   ew-viewer-ws:
     build:
       context: ./services/stations
-      dockerfile: DockerFile
+      dockerfile: Dockerfile
     image: ew-viewer-ws-dev:latest
     container_name: earthworm-websocket-server-dev
     entrypoint: [
@@ -103,7 +103,7 @@ services:
   wave-client:
     build:
       context: ./services/stations
-      dockerfile: DockerFile
+      dockerfile: Dockerfile
     image: ew-viewer-ws-dev:latest
     container_name: wave-client-dev
     entrypoint: [
