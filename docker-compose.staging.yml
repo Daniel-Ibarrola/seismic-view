@@ -39,6 +39,9 @@ services:
     image: ew-viewer-client-staging:latest
     container_name: earthworm-viewer-client-dev
     command: "nginx -g \"daemon off;\""
+    depends_on:
+      - ew-viewer-auth
+      - ew-viewer-ws
     ports:
       - "80:80"
 
@@ -77,13 +80,14 @@ services:
 
   postgres:
     build:
-      context: ./services/cap-api/db
+      context: ./services/auth/db
       dockerfile: Dockerfile
     restart: always
-    image: rss-db:latest
+    image: ew_auth-db:latest
     container_name: rss-db
-    env_file:
-      - services/cap-api/.env
+    environment:
+      - POSTGRES_USER=ewauth
+      - POSTGRES_PASSWORD=abc123
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
       - ./pg_backup:/pg_backup/

@@ -90,13 +90,15 @@ services:
 
   postgres:
     build:
-      context: ./services/cap-api/db
+      context: ./services/auth/db
       dockerfile: Dockerfile
     restart: always
-    image: rss-db:latest
+    image: ew_auth-db:latest
     container_name: rss-db
     env_file:
-      - services/cap-api/.env
+      - services/cap-api/.env.prod
+    environment:
+      - POSTGRES_USER=ewauth
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
       - ./pg_backup:/pg_backup/

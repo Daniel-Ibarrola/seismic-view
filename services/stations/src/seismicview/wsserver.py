@@ -10,6 +10,7 @@ from typing import Callable, Optional
 import websockets
 
 from seismicview import CONFIG
+from seismicview.models import Wave
 
 
 class WSServer:
@@ -77,7 +78,7 @@ class WSServer:
         """
         if connections:
             data_str = data.decode()
-            data_json = json.loads(data_str)
+            data_json: Wave = json.loads(data_str)
             current_station = data_json["station"]
             for ws, station in connections.items():
                 if station == current_station:
