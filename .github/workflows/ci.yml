@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build container
-        run: docker compose up ew-viewer-client -d
+        run: docker compose up ew-viewer-auth -d
 
       - name: Run tests
         run: docker compose run --rm --no-deps --entrypoint=pytest ew-viewer-auth /tests/
