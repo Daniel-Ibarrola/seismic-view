@@ -1,0 +1,17 @@
+.navbar {
+    color: white;
+    padding-bottom: 10px;
+}
+
+.navbar > a {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar > a:hover {
+    color: white;
+}
+
+body {
+    background-color: #F2F4F4;
+}

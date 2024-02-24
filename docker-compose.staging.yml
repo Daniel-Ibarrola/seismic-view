@@ -5,9 +5,9 @@ services:
   ew-viewer-ws:
     build:
       context: ./services/stations
-      dockerfile: Dockerfile
-    image: ew-viewer-ws-dev:latest
-    container_name: earthworm-websocket-server-dev
+      dockerfile: Dockerfile.prod
+    image: ew-viewer-ws-prod:latest
+    container_name: earthworm-websocket-server-prod
     entrypoint: [
         "python",
         "/src/seismicview/main.py"
@@ -19,86 +19,78 @@ services:
       interval: 2m
       timeout: 10s
       retries: 3
+    restart: unless-stopped
     environment:
-      - CONFIG=dev
+      - CONFIG=prod
       # Address from which the server receives information
       - SERVER_HOST_IP=ew-viewer-ws
       - SERVER_HOST_PORT=13342
       # Address of the websocket server
       - WS_SERVER_HOST_IP=ew-viewer-ws
       - WS_SERVER_HOST_PORT=13345
-      # Domain for unit testing
-      - HOST_DOMAIN_TEST=0.0.0.0
     ports:
       - "13342:13342"
       - "13345:13345"
-    volumes:
-      - ./services/stations/src:/src
-      - ./services/stations/tests:/tests
 
   ew-viewer-client:
-    stdin_open: true
     build:
       context: ./services/client
-      dockerfile: Dockerfile
-    image: ew-viewer-client-dev:latest
-    container_name: earthworm-viewer-client-dev
-    volumes:
-      - ./services/client/src:/app/src
-#      - ./services/client/node_modules:/app/node_modules
-      - ./services/client/vite.config.js:/app/vite.config.js
+      dockerfile: Dockerfile.staging
+    image: ew-viewer-client-staging:latest
+    container_name: earthworm-viewer-client-staging
+    command: "nginx -g \"daemon off;\""
+    depends_on:
+      - ew-viewer-auth
+      - ew-viewer-ws
     ports:
-      - "5173:5173"
-    env_file:
-      - services/client/.env
+      - "80:80"
 
   ew-viewer-auth:
     build:
       context: ./services/auth
-      dockerfile: Dockerfile
-    image: ew-viewer-auth-dev:latest
-    container_name: earthworm-viewer-auth-dev
+      dockerfile: Dockerfile.prod
+    image: ew-viewer-auth-prod:latest
+    container_name: earthworm-viewer-auth-prod
     env_file:
-      - ./services/auth/.env
+      - ./services/auth/.env.prod
+    restart: unless-stopped
     command: >
       sh -c "
         flask wait-for-db &&
         flask db upgrade &&
         flask insert-admin &&
-        flask run --host=0.0.0.0 --port=80"
+        gunicorn --bind 0.0.0.0:5000 ewauth.wsgi:app"
     environment:
       - FLASK_APP=ewauth/app.py
-      - FLASK_DEBUG=1
-      - PYTHONUNBUFFERED=1
       - DB_HOST=postgres
       - DB_USER=ewauth
       - DB_NAME=ewauth
       - DB_PASSWORD=abc123
       - DB_PORT=5432
-      - API_HOST=ew-viewer-auth
-      - CONFIG=dev
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:80/" ]
-      interval: 1m
-      timeout: 10s
-      retries: 3
+      - CONFIG=prod
     depends_on:
       - postgres
-    volumes:
-      - ./services/auth/src:/src
-      - ./services/auth/tests:/tests
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/" ]
+      interval: 3m
+      timeout: 10s
+      retries: 3
     ports:
       - "5000:80"
 
   postgres:
-    image: postgres:15.2-alpine
+    build:
+      context: ./services/auth/db
+      dockerfile: Dockerfile
+    restart: always
+    image: ew_auth-db:latest
     container_name: ew-auth-db
     environment:
-      # Note user and db name will be the same
       - POSTGRES_USER=ewauth
       - POSTGRES_PASSWORD=abc123
-    ports:
-      - "54321:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./pg_backup:/pg_backup/
 
   wave-client:
     build:
@@ -117,3 +109,7 @@ services:
       - SERVER_HOST_PORT=13342
     volumes:
       - ./services/stations/src:/src
+
+
+volumes:
+  db_volume:

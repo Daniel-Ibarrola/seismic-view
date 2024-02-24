@@ -1,0 +1,4 @@
+-r common.txt
+bumpver==2023.1125
+pytest==7.4.0
+requests==2.31.0

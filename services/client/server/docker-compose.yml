@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+
+  ws-server:
+    build:
+      dockerfile: Dockerfile
+    entrypoint: [
+      "python",
+      "server.py",
+      "--ip",
+      "ws-server",
+      "--port",
+      "8765"
+    ]
+    ports:
+      - "8765:8765"
+    networks:
+      - ew-proxy
+
+networks:
+  ew-proxy:
+    external: true
+    name: earthworm

@@ -57,9 +57,6 @@ coverage.xml
 # pyenv
 .python-version
 
-# dotenv
-.env
-
 # virtualenv
 .venv
 venv/
@@ -87,9 +84,6 @@ record.txt
 
 # Data file
 *.csv
-
-#pycharm
-.idea/
 
 # This repo
 temp/

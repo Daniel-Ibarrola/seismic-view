@@ -1,0 +1,20 @@
+h2 {
+    text-align: center;
+    align-self: center;
+}
+
+.alert-msg {
+    text-align: center;
+    align-self: center;
+}
+
+.options-title {
+    text-align: center;
+    align-self: center;
+    margin-bottom: 0.5rem;
+    color: #1976d2;
+}
+
+.station-card {
+    margin-bottom: 2rem;
+}

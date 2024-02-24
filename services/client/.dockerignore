@@ -1,0 +1,21 @@
+.git
+.idea
+.dockerignore
+.gitignore
+.github/
+
+# Folders
+build/
+node_modules/
+dist/
+server/
+
+# Docker
+docker-compose.prod.yaml
+docker-compose.yaml
+Dockerfile
+Dockerfile-prod
+
+# Others
+Makefile
+README.md

@@ -1,6 +1,104 @@
+version: "3"
+
 services:
 
-  seismicview:
+  ew-viewer-ws:
+    build:
+      context: ./services/stations
+      dockerfile: Dockerfile.prod
+    image: ew-viewer-ws-prod:latest
+    container_name: earthworm-websocket-server-prod
+    entrypoint: [
+        "python",
+        "/src/seismicview/main.py"
+    ]
+    healthcheck:
+      # Check that both ports are listening
+      test: [ "CMD-SHELL",
+              "netstat -tln | grep 13345 && netstat -tln | grep 13342 || exit 1" ]
+      interval: 2m
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
     environment:
       - CONFIG=prod
+      # Address from which the server receives information
+      - SERVER_HOST_IP=ew-viewer-ws
+      - SERVER_HOST_PORT=13342
+      # Address of the websocket server
+      - WS_SERVER_HOST_IP=ew-viewer-ws
+      - WS_SERVER_HOST_PORT=13345
+    ports:
+      - "13342:13342"
+      - "13345:13345"
+
+  certbot:
+    image: certbot/certbot:latest
+    restart: unless-stopped
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ./certbot/www:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+
+  ew-viewer-client:
+    build:
+      context: ./services/client
+      dockerfile: Dockerfile.prod
+    image: ew-viewer-client-prod:latest
+    container_name: earthworm-viewer-client-dev
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./services/client/nginx/https.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+
+  ew-viewer-auth:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile.prod
+    image: ew-viewer-auth-prod:latest
+    container_name: earthworm-viewer-auth-prod
+    env_file:
+      - ./services/auth/.env.prod
+    restart: unless-stopped
+    command: >
+      sh -c "
+        flask wait-for-db &&
+        flask db upgrade &&
+        flask insert-admin &&
+        gunicorn --bind 0.0.0.0:5000 ewauth.wsgi:app"
+    environment:
+      - FLASK_APP=ewauth/app.py
+      - DB_HOST=postgres
+      - DB_USER=ewauth
+      - DB_NAME=ewauth
+      - DB_PASSWORD=abc123
+      - DB_PORT=5432
+      - CONFIG=prod
+    depends_on:
+      - postgres
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/" ]
+      interval: 3m
+      timeout: 10s
+      retries: 3
+    ports:
+      - "5000:80"
+
+  postgres:
+    build:
+      context: ./services/auth/db
+      dockerfile: Dockerfile
+    restart: always
+    image: ew_auth-db:latest
+    container_name: ew-auth-db
+    env_file:
+      - services/auth/.env.prod
+    environment:
+      - POSTGRES_USER=ewauth
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./pg_backup:/pg_backup/
