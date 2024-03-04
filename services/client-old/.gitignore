@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# pyton
+*.pyc
+server/venv
+
+# vite
+.vite/

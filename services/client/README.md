@@ -1,33 +1,30 @@
-# Earthworm Graphing App
+# React + TypeScript + Vite
 
-App to visualize earthworm data in real time.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Deployment to nginx
+Currently, two official plugins are available:
 
-To build the app for production use the following commands
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-```shell
-npm run build
-npm run preview
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname,
+  },
+}
 ```
-The last command will start a server to view the website in production mode.
-If everything is working as expected the app static files can be server in nginx.
-To do that copy the dist folder created by the build command to the path were nginx
-will look for the static files (typically /var/www/site-name).
 
-
-## Developing
-
-You can start the development server (port 5173) with:
-
-```shell
-make dev
-```
-
-Now go to http://localhost:5173 to see the React app.
-
-To run the tests use. The development server should be started first:
-
-```shell
-make test
-```
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

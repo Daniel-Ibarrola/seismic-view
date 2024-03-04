@@ -1,5 +1,5 @@
 # pull official base image
-FROM node:20.11
+FROM node:19
 
 WORKDIR /app
 COPY package.json /app/package.json
