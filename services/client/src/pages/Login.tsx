@@ -1,7 +1,8 @@
 import React from "react";
+import { AbstractAuthClient } from "../services/AuthClient.ts";
 
 type Props = {
-  prop?: string;
+  authClient: AbstractAuthClient;
 };
 
 export const Login: React.FC<Props> = () => {

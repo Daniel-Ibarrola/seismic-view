@@ -1,8 +1,8 @@
 export const WebsocketUri = import.meta.env.VITE_WEBSOCKET_DOMAIN;
 
-// Auth API
+// AuthClient API
 export const baseUrl = import.meta.env.VITE_API_DOMAIN + "/api/v1";
-// Auth endpoints
+// AuthClient endpoints
 export const changePasswordUrl = baseUrl + "/change_password/";
 export const confirmUrl = baseUrl + "/confirm/"
 export const tokensUrl = baseUrl + "/tokens/";

@@ -1,4 +1,4 @@
-# Earthworm Auth
+# Earthworm AuthClient
 
 Authentication backend for the earthworm grapher app.
 
