@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,18 +10,12 @@ export default defineConfig({
       "/api": {
         target: "http://ew-viewer-auth",
       },
-    }
+    },
   },
   test: {
     globals: true,
     environment: "jsdom",
-    setupFiles: [
-      "./tests/setup.js",
-    ],
-    include: [
-      './src/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-      './src/*/test.{jsx,js}',
-      './src/*/*/test.{jsx,js}'
-    ]
-  }
-})
+    setupFiles: ["./tests/setup.ts"],
+    include: ["./src/*/*/*.test.{tsx,ts}", "./src/*/*/*/*.test.{tsx,ts}"],
+  },
+});
