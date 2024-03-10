@@ -1,31 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 
 import { Login } from "../Login.jsx";
 import { FakeAuthClient, FakeUsers } from "./auth.mock.ts";
 import { localStorageMock } from "../../test/mocks.ts";
+import { waitForAuthFormSubmission } from "./submitAuthForm.ts";
 
 Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
 describe("Login", () => {
-  const waitForFormSubmission = async (
-    user: string,
-    password: string,
-    client: FakeAuthClient,
-  ): Promise<void> => {
-    fireEvent.change(screen.getByPlaceholderText("Email"), {
-      target: { value: user },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Contraseña"), {
-      target: { value: password },
-    });
-    fireEvent.click(screen.getAllByRole("button")[0]);
-    await waitFor(async () => client.login);
-  };
-
   it("Successful login redirects to stations page", async () => {
     const client = new FakeAuthClient();
     render(
@@ -34,7 +20,7 @@ describe("Login", () => {
       </BrowserRouter>,
     );
 
-    await waitForFormSubmission(FakeUsers.Valid, "password", client);
+    await waitForAuthFormSubmission(FakeUsers.Valid, "password", client.login);
 
     const token = window.localStorage.getItem("token");
     expect(token).not.toBeNull();
@@ -49,7 +35,11 @@ describe("Login", () => {
       </BrowserRouter>,
     );
 
-    await waitForFormSubmission(FakeUsers.Invalid, "password", client);
+    await waitForAuthFormSubmission(
+      FakeUsers.Invalid,
+      "password",
+      client.login,
+    );
 
     expect(
       screen.queryByText(/Usuario o contraseña inválidos/),
@@ -64,7 +54,11 @@ describe("Login", () => {
       </BrowserRouter>,
     );
 
-    await waitForFormSubmission(FakeUsers.Unconfirmed, "password", client);
+    await waitForAuthFormSubmission(
+      FakeUsers.Unconfirmed,
+      "password",
+      client.login,
+    );
     expect(screen.queryByText(/no confirmado/)).toBeInTheDocument();
     expect(
       screen.queryByText(/reenviar email de confirmación/),
@@ -80,7 +74,11 @@ describe("Login", () => {
     );
 
     try {
-      await waitForFormSubmission(FakeUsers.Unconfirmed, "password", client);
+      await waitForAuthFormSubmission(
+        FakeUsers.Unconfirmed,
+        "password",
+        client.login,
+      );
     } catch (error) {
       expect(screen.queryByText(/Error al iniciar/)).toBeInTheDocument();
     }

@@ -1,17 +1,15 @@
-import {
-  AbstractAuthClient,
-  LoginResponse,
-} from "../../services/AuthClient.ts";
+import { AbstractAuthClient, AuthResponse } from "../../services/AuthClient.ts";
 
 export enum FakeUsers {
   Invalid = "Invalid",
   Valid = "Valid",
   Unconfirmed = "Unconfirmed",
   Error = "Error",
+  InUse = "InUse",
 }
 
 export class FakeAuthClient extends AbstractAuthClient {
-  async login(user: string, password: string): Promise<LoginResponse> {
+  async login(user: string, password: string): Promise<AuthResponse> {
     void password;
     if (user === FakeUsers.Invalid) {
       return {
