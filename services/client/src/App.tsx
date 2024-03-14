@@ -1,11 +1,10 @@
+import { Login } from "./pages/Login.tsx";
+import { AuthClient } from "./services/AuthClient.ts";
 import "./App.css";
 
 function App() {
-  return (
-    <>
-      <h1>Hello World</h1>
-    </>
-  );
+  const authClient = new AuthClient();
+  return <Login authClient={authClient} />;
 }
 
 export default App;
